@@ -24,6 +24,7 @@ noinst_LTLIBRARIES += %D%/libtarget.la
 	$(STM8_SRC) \
 	$(INTEL_IA32_SRC) \
 	$(ESIRISC_SRC) \
+	$(XTENSA_SRC) \
 	%D%/avrt.c \
 	%D%/dsp563xx.c \
 	%D%/dsp563xx_once.c \
@@ -156,6 +157,9 @@ ESIRISC_SRC = \
 	%D%/esirisc_jtag.c \
 	%D%/esirisc_trace.c
 
+XTENSA_SRC = \
+	%D%/xtensa.c
+
 %C%_libtarget_la_SOURCES += \
 	%D%/algorithm.h \
 	%D%/arm.h \
@@ -218,6 +222,7 @@ ESIRISC_SRC = \
 	%D%/target_request.h \
 	%D%/trace.h \
 	%D%/xscale.h \
+	%D%/xtensa.h \
 	%D%/smp.h \
 	%D%/avr32_ap7k.h \
 	%D%/avr32_jtag.h \
@@ -247,3 +252,4 @@ ESIRISC_SRC = \
 
 include %D%/openrisc/Makefile.am
 include %D%/riscv/Makefile.am
+
