@@ -575,7 +575,7 @@ static int xtensa_halt(struct target *target)
 
 static int xtensa_resume(struct target *target,
 			 int current,
-			 uint32_t address,
+			 target_addr_t address,
 			 int handle_breakpoints,
 			 int debug_execution)
 {
@@ -583,7 +583,7 @@ static int xtensa_resume(struct target *target,
 	uint8_t buf[4];
 	int res;
 
-	LOG_DEBUG("%s current=%d address=%04" PRIx32, __func__, current, address);
+	LOG_DEBUG("%s current=%d address=%04" PRIx32, __func__, current, (unsigned)address);
 
 	if (target->state != TARGET_HALTED) {
 		LOG_WARNING("%s: target not halted", __func__);
@@ -623,7 +623,7 @@ static int xtensa_resume(struct target *target,
 
 static int xtensa_step(struct target *target,
 	int current,
-	uint32_t address,
+	target_addr_t address,
 	int handle_breakpoints)
 {
 	int res;
@@ -638,7 +638,7 @@ static int xtensa_step(struct target *target,
 		return ERROR_TARGET_NOT_HALTED;
 	}
 
-	LOG_DEBUG("%s current=%d address=%"PRIx32, __func__, current, address);
+	LOG_DEBUG("%s current=%d address=%"PRIx32, __func__, current, (unsigned)address);
 
 	/* Load debug level into ICOUNTLEVEL
 
@@ -808,7 +808,7 @@ static int xtensa_deassert_reset(struct target *target)
 }
 
 static int xtensa_read_memory_inner(struct target *target,
-				    uint32_t address,
+				    target_addr_t address,
 				    uint32_t size,
 				    uint32_t count,
 				    uint8_t *buffer)
@@ -862,7 +862,7 @@ static int xtensa_read_memory_inner(struct target *target,
 
 
 static int xtensa_read_memory(struct target *target,
-			      uint32_t address,
+			      target_addr_t address,
 			      uint32_t size,
 			      uint32_t count,
 			      uint8_t *buffer)
@@ -894,10 +894,10 @@ static int xtensa_read_memory(struct target *target,
 	*/
 	while(count > 255) {
 		LOG_DEBUG("%s: splitting read from 0x%" PRIx32 " size %d count 255",__func__,
-			  address,size);
+			  (unsigned)address,size);
 		res = xtensa_read_memory_inner(target, address, size, 255, buffer);
 		if(res != ERROR_OK) {
-			LOG_ERROR("%s: inner read failed at address 0x%" PRIx32, __func__, address);
+			LOG_ERROR("%s: inner read failed at address 0x%" PRIx32, __func__, (unsigned)address);
 			return res;
 		}
 		count -= 255;
@@ -906,14 +906,14 @@ static int xtensa_read_memory(struct target *target,
 	}
 	res = xtensa_read_memory_inner(target, address, size, count, buffer);
 	if(res != ERROR_OK) {
-		LOG_ERROR("%s: final read failed at address 0x%" PRIx32, __func__, address);
+		LOG_ERROR("%s: final read failed at address 0x%" PRIx32, __func__, (unsigned)address);
 	}
 
 	return res;
 }
 
 static int xtensa_write_memory_inner(struct target *target,
-				     uint32_t address,
+				     target_addr_t address,
 				     uint32_t size,
 				     uint32_t count,
 				     const uint8_t *buffer)
@@ -960,7 +960,7 @@ static int xtensa_write_memory_inner(struct target *target,
 }
 
 static int xtensa_write_memory(struct target *target,
-			       uint32_t address,
+			       target_addr_t address,
 			       uint32_t size,
 			       uint32_t count,
 			       const uint8_t *buffer)
@@ -994,10 +994,10 @@ static int xtensa_write_memory(struct target *target,
 	*/
 	while(count > 255) {
 		LOG_DEBUG("%s: splitting read from 0x%" PRIx32 " size %d count 255",__func__,
-			  address,size);
+			  (unsigned)address,size);
 		res = xtensa_write_memory_inner(target, address, size, 255, buffer);
 		if(res != ERROR_OK) {
-			LOG_ERROR("%s: inner write failed at address 0x%" PRIx32, __func__, address);
+			LOG_ERROR("%s: inner write failed at address 0x%" PRIx32, __func__, (unsigned)address);
 
 			return res;
 		}
@@ -1007,7 +1007,7 @@ static int xtensa_write_memory(struct target *target,
 	}
 	res = xtensa_write_memory_inner(target, address, size, count, buffer);
 	if(res != ERROR_OK) {
-		LOG_ERROR("%s: final write failed at address 0x%" PRIx32, __func__, address);
+		LOG_ERROR("%s: final write failed at address 0x%" PRIx32, __func__, (unsigned)address);
 	}
 
 	/* NB: if we were supporting the ICACHE option, we would need
@@ -1017,12 +1017,12 @@ static int xtensa_write_memory(struct target *target,
 }
 
 static int xtensa_read_buffer(struct target *target,
-			      uint32_t address,
+			      target_addr_t address,
 			      uint32_t count,
 			      uint8_t *buffer)
 {
 	uint8_t *aligned_buffer;
-	uint32_t aligned_address;
+	target_addr_t aligned_address;
 	uint32_t aligned_count;
 	int res;
 
@@ -1037,7 +1037,7 @@ static int xtensa_read_buffer(struct target *target,
 		aligned_buffer = buffer;
 
 	LOG_DEBUG("%s: aligned_address=0x%" PRIx32 " aligned_count=0x%"
-		  PRIx32, __func__, aligned_address, aligned_count);
+		  PRIx32, __func__, (unsigned)aligned_address, aligned_count);
 
 	res = xtensa_read_memory(target, aligned_address,
 				 4, aligned_count/4,
@@ -1054,12 +1054,12 @@ static int xtensa_read_buffer(struct target *target,
 }
 
 static int xtensa_write_buffer(struct target *target,
-			       uint32_t address,
+			       target_addr_t address,
 			       uint32_t count,
 			       const uint8_t *buffer)
 {
 	uint8_t *aligned_buffer = 0;
-	uint32_t aligned_address;
+	target_addr_t aligned_address;
 	uint32_t aligned_count;
 	int res;
 
@@ -1088,7 +1088,7 @@ static int xtensa_write_buffer(struct target *target,
 	}
 
 	LOG_DEBUG("%s: aligned_address=0x%" PRIx32 " aligned_count=0x%"
-		  PRIx32, __func__, aligned_address, aligned_count);
+		  PRIx32, __func__, (unsigned)aligned_address, aligned_count);
 
 	res = xtensa_write_memory(target, aligned_address,
 				  4, aligned_count/4,
@@ -1173,7 +1173,7 @@ static int xtensa_add_breakpoint(struct target *target, struct breakpoint *break
 			return res;
 		
 		breakpoint->type = BKPT_HARD;
-		LOG_WARNING("Cannot set a software breakpoint at 0x%x. Trying a hardware one instead...", breakpoint->address);
+		LOG_WARNING("Cannot set a software breakpoint at 0x%x. Trying a hardware one instead...", (unsigned)breakpoint->address);
 	}
 
 	if (!xtensa->free_brps) {
@@ -1517,26 +1517,26 @@ static void xtensa_feed_esp8266_watchdog(struct target *target)
 	}
 }
 
-static COMMAND_HELPER(xtensa_no_interrupts_during_steps, const char **sep, const char **name)
+COMMAND_HANDLER(xtensa_no_interrupts_during_steps)
 {
 	if (CMD_ARGC > 1)
 		return ERROR_COMMAND_SYNTAX_ERROR;
 	if (CMD_ARGC == 1) 
 		COMMAND_PARSE_ENABLE(CMD_ARGV[0], s_DisableInterruptsForStepping);
 	
-	command_print(CMD_CTX, "Interrupt suppression during single-stepping is %s%s", (CMD_ARGC == 1) ? "now " : "", s_DisableInterruptsForStepping ? "enabled" : "disabled");
+	command_print(CMD, "Interrupt suppression during single-stepping is %s%s", (CMD_ARGC == 1) ? "now " : "", s_DisableInterruptsForStepping ? "enabled" : "disabled");
 
 	return ERROR_OK;
 }
 
-static COMMAND_HELPER(esp8266_autofeed_watchdog, const char **sep, const char **name)
+COMMAND_HANDLER(esp8266_autofeed_watchdog)
 {
 	if (CMD_ARGC > 1)
 		return ERROR_COMMAND_SYNTAX_ERROR;
 	if (CMD_ARGC == 1) 
 		COMMAND_PARSE_ENABLE(CMD_ARGV[0], s_FeedWatchdogDuringStops);
 	
-	command_print(CMD_CTX, "Watchdog feeding during stops is %s%s", (CMD_ARGC == 1) ? "now " : "", s_FeedWatchdogDuringStops ? "enabled" : "disabled");
+	command_print(CMD, "Watchdog feeding during stops is %s%s", (CMD_ARGC == 1) ? "now " : "", s_FeedWatchdogDuringStops ? "enabled" : "disabled");
 
 	return ERROR_OK;
 }
@@ -1544,14 +1544,14 @@ static COMMAND_HELPER(esp8266_autofeed_watchdog, const char **sep, const char **
 struct command_registration xtensa_commands[] = {
 	{
 		.name = "xtensa_no_interrupts_during_steps",
-		.handler = (command_handler_t) &xtensa_no_interrupts_during_steps,
+		.handler = xtensa_no_interrupts_during_steps,
 		.mode = COMMAND_ANY,
 		.usage = "[enable|disable]",
 		.help = "Specifies whether the INTENABLE register will be set to 0 during single-stepping, temporarily disabling interrupts",
 	},
 	{
 		.name = "esp8266_autofeed_watchdog",
-		.handler = (command_handler_t) &esp8266_autofeed_watchdog,
+		.handler = esp8266_autofeed_watchdog,
 		.mode = COMMAND_ANY,
 		.usage = "[enable|disable]",
 		.help = "Specifies whether OpenOCD will feed the ESP8266 software watchdog while the target is halted",
