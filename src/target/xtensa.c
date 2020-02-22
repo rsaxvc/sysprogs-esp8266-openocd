@@ -179,7 +179,7 @@ static const struct xtensa_core_reg xt_regs[] = {
 	{ XT_REG_IDX_A13, "a13",                   0x0d, XT_REG_GENERAL, 0 },
 	{ XT_REG_IDX_A14, "a14",                   0x0e, XT_REG_GENERAL, 0 },
 	{ XT_REG_IDX_A15, "a15",                   0x0f, XT_REG_GENERAL, 0 },
-	{ XT_REG_IDX_PC,  "PC",                    0xb0, XT_REG_ALIASED, 0 },
+	{ XT_REG_IDX_PC,  "pc",                    0xb0, XT_REG_ALIASED, 0 },
 	{ XT_REG_IDX_SAR, "SAR",                   0x03, XT_REG_SPECIAL, 0 },
 	{ XT_REG_IDX_LITBASE,      "LITBASE",      0x05, XT_REG_SPECIAL, 0 },
 	{ XT_REG_IDX_SR176,        "SR176",        0xb0, XT_REG_SPECIAL, 0 },
@@ -1456,6 +1456,7 @@ static void xtensa_build_reg_cache(struct target *target)
 		reg_list[i].value = calloc(1,4);
 		reg_list[i].dirty = 0;
 		reg_list[i].valid = 0;
+		reg_list[i].exist = true;
 		reg_list[i].type = &xtensa_reg_type;
 		reg_list[i].arch_info = &arch_info[i];
 	}
